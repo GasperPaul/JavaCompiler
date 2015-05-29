@@ -1,0 +1,215 @@
+translation_unit		::= λ
+translation_unit 		::= type_declaration 		translation_unit
+
+type_declaration		::= class_declarator		class_body
+class_declarator		::= modifier				class_signature
+class_declarator 		::= class_token				r_class
+class_declarator		::= class_token 			class_name
+class_signature			::= class_token 			r_class
+class_signature 		::= class_token 			class_name
+r_class					::=	class_name				extends_statement
+r_class					::= class_name 				implements_statement
+extends_statement 		::= extends_token			r_extends_list
+extends_statement 		::= extends_token 			class_name
+r_extends_list			::= class_name				implements_statement
+implements_statement 	::= implements_token 		class_name
+implements_statement	::= implements_token		interface_list
+interface_list 			::= class_name				r_list
+r_list					::= comma					interface_list
+r_list 					::= comma					class_name
+class_name				::= Identifier
+class_token 			::= class
+class_token				::= interface
+extends_token 			::= extends
+implements_token 		::= implements
+
+class_body 				::= ;
+class_body 				::= l_brace	r_brace
+class_body 				::= l_brace	class_part
+class_part 				::= field_declaration		class_part
+class_part 				::= field_declaration		r_brace
+class_part 				::= func_declaration		class_part
+class_part 				::= func_declaration		r_brace
+
+field_declaration		::= modifier				field_declaration
+field_declaration		::= declarator 				declared_var
+
+func_declaration 		::= func_signature 			block
+func_declaration		::= func_declarator			block
+func_declarator 		::= modifier 				func_signature
+func_signature			::= declarator 				r_func_signature
+func_signature 			::= void_token 				r_func_signature
+r_func_signature		::= func_name 				parameters_list
+parameters_list 		::= l_paren					r_paren
+parameters_list 		::= l_paren 				r_parameters
+r_parameters 			::= parameter_decl 			r_paren
+r_parameters 			::= parameter_decl 			r_other_parameters
+r_other_parameters 		::= comma 					r_parameters
+parameter_decl 			::= declarator 				var_name
+void_token 				::= void
+func_name				::= Identifier
+
+modifier				::= modifier				modifier
+modifier				::= public
+modifier				::= private
+modifier				::= protected
+modifier 				::= static
+modifier 				::= abstract
+modifier				::= final
+modifier 				::= strictfp
+
+var_declaration			::= declarator 				declared_var
+declared_var			::= var_name				semicolon
+declared_var 			::= var_name				other_vars
+declared_var 			::= var_definition			semicolon
+declared_var 			::= var_definition			other_vars
+other_vars 				::= comma					declared_var
+var_definition			::= var_name 				r_var_definition
+r_var_definition		::= equals					expression
+r_var_definition 		::= equals		 			bool_expr
+comma 					::= ,
+equals		 			::= =
+var_name				::= Identifier
+declarator				::= int
+declarator				::= byte
+declarator 				::= char
+declarator				::= float
+declarator				::= double
+declarator 				::= boolean
+declarator 				::= Identifier
+
+var_assignment 			::=	var_name				r_var_assignment
+var_assignment 			::=	var_name				r_var_definition
+r_var_assignment		::=	assignment_expression	semicolon
+assignment_expression	::=	assignment_op			expression
+assignment_expression	::=	assignment_op			bool_expr
+assignment_op 			::= +=
+assignment_op 			::= -=
+assignment_op 			::= *=
+assignment_op 			::= /=
+assignment_op 			::= %=
+assignment_op 			::= &=
+assignment_op 			::= |=
+assignment_op 			::= ^=
+assignment_op 			::= >>=
+assignment_op 			::= <<=
+assignment_op 			::= >>>=
+assignment_op 			::= <<<=
+
+short_if_statement 		::= if_condition			block
+short_if_statement		::= if_condition			semicolon
+short_if_statement 		::= if_condition			var_assignment
+short_if_statement 		::= if_condition			short_if_statement
+short_if_statement 		::= if_condition			long_if_statement
+short_if_statement 		::= if_condition			while_statement
+if_condition			::= if_token 				bool_clause
+if_token 				::= if
+
+long_if_statement		::= short_if_statement		else_part
+else_part 				::= else_token 				block
+else_part 				::= else_token				semicolon
+else_part 				::= else_token 				var_assignment
+else_part 				::= else_token 				short_if_statement
+else_part 				::= else_token				long_if_statement
+else_part 				::= else_token 				while_statement
+else_token 				::= else
+
+while_statement			::= while_condition			block
+while_statement 		::= while_condition 		semicolon
+while_statement 		::=	while_condition 		var_assignment
+while_statement 		::= while_condition 		short_if_statement
+while_statement 		::= while_condition			long_if_statement
+while_statement 		::= while_condition			while_statement
+while_condition			::= while_token				bool_clause
+while_token				::= while
+
+bool_clause				::= l_paren 				r_clause_part
+r_clause_part 			::= bool_expr 				r_paren
+l_paren 				::= (
+r_paren 				::= )
+
+block					::= l_brace					r_brace
+block					::= l_brace					block_part
+block_part				::= block					block_part
+block_part				::=	semicolon				block_part
+block_part 				::= var_declaration 		block_part
+block_part 				::= var_assignment 			block_part
+block_part				::= short_if_statement		block_part
+block_part				::=	long_if_statement		block_part
+block_part				::= while_statement			block_part
+block_part				::= block					r_brace
+block_part				::=	semicolon				r_brace
+block_part 				::= var_declaration 		r_brace
+block_part 				::= var_assignment 			r_brace
+block_part				::= short_if_statement		r_brace
+block_part				::=	long_if_statement		r_brace
+block_part				::= while_statement			r_brace
+semicolon				::= ;
+l_brace					::= {
+r_brace					::= }
+
+expression				::= Identifier
+expression				::= CharLiteral
+expression				::= FloatLiteral
+expression				::= StringLiteral
+expression				::= IntegerLiteral
+expression				::= BooleanLiteral
+
+expression 				::= l_unary_operator		expression
+l_unary_operator 		::= ++
+l_unary_operator 		::= --
+l_unary_operator 		::= ~
+l_unary_operator 		::= +
+l_unary_operator 		::= -
+
+expression 				::= expression 				r_unary_operator
+r_unary_operator 		::= ++
+r_unary_operator 		::= --
+
+expression				::= bool_expr				operator_expression
+expression				::= expression				operator_expression
+operator_expression		::= operator 				expression
+operator_expression		::= bool_operator 			expression
+operator_expression		::= operator 				bool_expr
+operator_expression		::= bool_operator 			bool_expr
+operator 				::= +
+operator 				::= -
+operator 				::= *
+operator 				::= /
+operator 				::= %
+operator 				::= .
+operator 				::= &
+operator 				::= |
+operator 				::= ^
+operator 				::= >>
+operator 				::= <<
+operator 				::= >>>
+operator 				::= <<<
+
+expression 				::= bool_expr 				ternary_part
+expression 				::= bool_clause 			ternary_part
+ternary_part 			::=	ternary_true			ternary_false
+ternary_true 			::= question				expression
+ternary_true 			::= question	 			bool_expr
+ternary_false 			::= colon		 			expression
+ternary_false 			::= colon		 			bool_expr
+question 				::= ?
+colon					::= :
+	
+expression				::= l_paren 				paren_expression
+paren_expression		::= expression				r_paren
+
+bool_expr				::= expression				r_bool_expr
+bool_expr 				::= bool_expr				r_bool_expr
+bool_expr 				::= unary_not				bool_expr
+r_bool_expr				::=	bool_operator			expression
+r_bool_expr				::=	bool_operator			bool_expr
+unary_not 				::= !
+bool_operator			::= ==
+bool_operator 			::= !=
+bool_operator 			::= >
+bool_operator 			::= <
+bool_operator 			::= >=
+bool_operator 			::= <=
+bool_operator 			::= ||
+bool_operator 			::= &&
