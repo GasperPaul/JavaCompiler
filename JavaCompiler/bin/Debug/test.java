@@ -9,10 +9,12 @@ class Test {
 			{
 				int k =2;
 			}
+			int p;
 		}
 	}
 
-	int test (int f) { }
+	//int test (int f) { }
+	//int k;
 
 	/* Main function */
 	public static void Main() {

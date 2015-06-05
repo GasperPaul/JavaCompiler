@@ -33,16 +33,26 @@ namespace JavaCompiler
         private string className = string.Empty;
         private string funcName = string.Empty;
         private string type = string.Empty;
+        private string Block
+        {
+            get
+            {
+                return !string.IsNullOrWhiteSpace(className)
+                    ? className + (!inFunction ? string.Empty : ("::" + funcName + "::_" + currentBlock))
+                    : "namespace";
+            }
+        }
+
+        private bool inFunction = false;
 
         public IReadOnlyList<Variable> Analyse(JavaCompiler.Parser.Node tree)
         {
             tree.Traverse(node =>
             {
-                string block = className + (string.IsNullOrWhiteSpace(funcName) ? string.Empty : ("::" + funcName + "::_" + currentBlock));
                 switch (node.Value.ToString())
                 {
                     case "block":
-                        if (string.IsNullOrWhiteSpace(funcName)) break;
+                        if (!inFunction) inFunction = true;
                         else
                         {
                             blocks.Push(currentBlock);
@@ -56,7 +66,10 @@ namespace JavaCompiler
                         else
                         {
                             if (!string.IsNullOrWhiteSpace(funcName))
+                            {
+                                inFunction = false;
                                 funcName = string.Empty;
+                            }
                             else
                                 className = string.Empty;
                             currentBlock = 0;
@@ -76,13 +89,13 @@ namespace JavaCompiler
                                         break;
                                     case "var_name":
                                         string name = y.Left.Value.ToString();
-                                        if (namesTable.Exists(x => x.Name == name && x.Block == block))
+                                        if (namesTable.Exists(x => x.Name == name && x.Block == Block))
                                         {
                                             var errorLine = GetErrorLine(node);
                                             errors.Add(string.Format("Redeclaration of variable {0}:\n{1}", name, errorLine));
                                             return;
                                         }
-                                        namesTable.Add(new Variable(type, name, block));
+                                        namesTable.Add(new Variable(name, type, Block));
                                         break;
                                 }
                             });
@@ -98,24 +111,24 @@ namespace JavaCompiler
                                     break;
                                 case "var_name":
                                     string name = y.Left.Value.ToString();
-                                    if (namesTable.Exists(x => x.Name == name && x.Block == block))
+                                    if (namesTable.Exists(x => x.Name == name && x.Block == Block))
                                     {
                                         var errorLine = GetErrorLine(node);
                                         errors.Add(string.Format("Redeclaration of variable {0}:\n{1}", name, errorLine));
                                         return;
                                     }
-                                    namesTable.Add(new Variable(type, name, block));
+                                    namesTable.Add(new Variable(name, type, Block));
                                     break;
                             }
                         });
                         break;
                     case "class_declarator":
                         className = node.Right.Left.Value.ToString();
-                        namesTable.Add(new Variable(node.Left.Left.Value.ToString(), className, "namespace"));
+                        namesTable.Add(new Variable(className, node.Left.Left.Value.ToString(), Block));
                         break;
-                    case "func_declarator":
+                    case "func_signature":
                         StringBuilder funcSignature = new StringBuilder("function ");
-                        node.Right.Traverse(x =>
+                        node.Traverse(x =>
                         {
                             switch (x.Value.ToString())
                             {
@@ -132,13 +145,13 @@ namespace JavaCompiler
                                     break;
                             }
                         });
-                        if (namesTable.Exists(x => x.Name == funcName && x.Block == block && x.Type == funcSignature.ToString()))
+                        if (namesTable.Exists(x => x.Name == funcName && x.Block == Block && x.Type == funcSignature.ToString()))
                         {
                             var errorLine = GetErrorLine(node);
                             errors.Add(string.Format("Redeclaration of function {0}:\n{1}", funcName, errorLine));
                             return;
                         }
-                        namesTable.Add(new Variable(funcName, funcSignature.ToString(), block));
+                        namesTable.Add(new Variable(funcName, funcSignature.ToString(), Block));
                         break;
                     case "expression":
                         /*if (node.Right == null)
